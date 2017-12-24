@@ -5,7 +5,7 @@ static int signum(int n)
     return (int) (n > 0) - (int) (n < 0);
 }
 
-bool intersect(line* l1, line* l2)
+bool lines_intersect(line* l1, line* l2)
 {
     if (l1->p1 == l2->p1 || l1->p1 == l2->p2 || l1->p2 == l2->p1 || l1->p2 == l2->p2)
     {
@@ -37,7 +37,7 @@ bool intersect(line* l1, line* l2)
     return overlap_x_min <= x_numerator && x_numerator <= overlap_x_max && overlap_y_min <= y_numerator && y_numerator <= overlap_y_max;
 }
 
-bool intersect(line* l, point* p)
+bool line_contains_point(line* l, point* p)
 {
     if (l->p1 == p || l->p2 == p)
     {

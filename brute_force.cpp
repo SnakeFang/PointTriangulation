@@ -11,35 +11,11 @@ std::vector<line*> triangulate_brute_force(const std::vector<point*>& points)
             line l(points[i], points[j]);
             bool intersects_any = true;
 
-            for (point* other : points)
+            if (!std::any_of(points.begin(), points.end(), std::bind(&line_contains_point, &l, std::placeholders::_1))
+             && !std::any_of(lines.begin(), lines.end(), std::bind(&lines_intersect, &l, std::placeholders::_1)))
             {
-                if (intersect(&l, other))
-                {
-                    intersects_any = false;
-                    break;
-                }
+                lines.push_back(new line(l));
             }
-
-            if (!intersects_any)
-            {
-                continue;
-            }
-
-            for (line* other : lines)
-            {
-                if (intersect(&l, other))
-                {
-                    intersects_any = false;
-                    break;
-                }
-            }
-
-            if (!intersects_any)
-            {
-                continue;
-            }
-
-            lines.push_back(new line(l));
         }
     }
 

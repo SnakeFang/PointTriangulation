@@ -16,18 +16,8 @@ std::vector<line*> triangulate_moving_shell(const std::vector<point*>& points)
         for (point* point_shell : points_shell)
         {
             line line_candidate(point_new, point_shell);
-            bool intersects_any = false;
 
-            for (line* line_shell : lines_shell)
-            {
-                if (intersect(&line_candidate, line_shell))
-                {
-                    intersects_any = true;
-                    break;
-                }
-            }
-
-            if (!intersects_any)
+            if (!std::any_of(lines_shell.begin(), lines_shell.end(), std::bind(&lines_intersect, &line_candidate, std::placeholders::_1)))
             {
                 line* line_shell = new line(line_candidate);
 

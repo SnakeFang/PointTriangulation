@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -57,8 +58,8 @@ struct line
     }
 };
 
-bool intersect(line*, line*);
-bool intersect(line*, point*);
+bool lines_intersect(line*, line*);
+bool line_contains_point(line*, point*);
 
 std::tuple<std::vector<point*>, int, int, int, int> read_points();
 void svgify(const std::string&, int, int, int, int, const std::vector<point*>&, const std::vector<line*>&);
