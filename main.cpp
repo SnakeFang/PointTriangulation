@@ -1,7 +1,3 @@
-#include <fstream>
-#include <iostream>
-#include <limits>
-
 #include "main.h"
 
 int main()
