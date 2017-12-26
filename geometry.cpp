@@ -28,11 +28,17 @@ bool lines_intersect(line* l1, line* l2)
     int x_numerator = (l1->c * l2->b - l1->b * l2->c);
     int y_numerator = (l1->c * l2->a - l1->a * l2->c);
 
+    int overlap_x_min = std::max(l1->x_min, l2->x_min);
+    int overlap_y_min = std::max(l1->y_min, l2->y_min);
+
+    int overlap_x_max = std::min(l1->x_max, l2->x_max);
+    int overlap_y_max = std::min(l1->y_max, l2->y_max);
+
     if (x_denominator == 0 && y_denominator == 0)
     {
         if (x_numerator == 0 && y_numerator == 0)
         {
-            return true;
+            return overlap_x_min <= x_numerator && x_numerator <= overlap_x_max && overlap_y_min <= y_numerator && y_numerator <= overlap_y_max;
         }
         else
         {
@@ -46,11 +52,11 @@ bool lines_intersect(line* l1, line* l2)
     x_denominator = std::abs(x_denominator);
     y_denominator = std::abs(y_denominator);
 
-    int overlap_x_min = std::max(l1->x_min, l2->x_min) * std::abs(x_denominator);
-    int overlap_y_min = std::max(l1->y_min, l2->y_min) * std::abs(y_denominator);
+    overlap_x_min *= x_denominator;
+    overlap_y_min *= y_denominator;
 
-    int overlap_x_max = std::min(l1->x_max, l2->x_max) * std::abs(x_denominator);
-    int overlap_y_max = std::min(l1->y_max, l2->y_max) * std::abs(y_denominator);
+    overlap_x_max *= x_denominator;
+    overlap_y_max *= y_denominator;
 
     return overlap_x_min <= x_numerator && x_numerator <= overlap_x_max && overlap_y_min <= y_numerator && y_numerator <= overlap_y_max;
 }
