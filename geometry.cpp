@@ -7,6 +7,11 @@ static int signum(int n)
 
 bool lines_intersect(line* l1, line* l2)
 {
+    if (l1 == nullptr || l1->p1 == nullptr || l1->p2 == nullptr || l2 == nullptr || l2->p1 == nullptr || l2->p2 == nullptr)
+    {
+        return false;
+    }
+
     if (l1->p1 == l2->p1 || l1->p1 == l2->p2 || l1->p2 == l2->p1 || l1->p2 == l2->p2)
     {
         return false;
@@ -20,13 +25,26 @@ bool lines_intersect(line* l1, line* l2)
     int x_denominator = l1->a * l2->b - l1->b * l2->a;
     int y_denominator = l1->b * l2->a - l1->a * l2->b;
 
-    if (x_denominator == 0 || y_denominator == 0)
+    int x_numerator = (l1->c * l2->b - l1->b * l2->c);
+    int y_numerator = (l1->c * l2->a - l1->a * l2->c);
+
+    if (x_denominator == 0 && y_denominator == 0)
     {
-        return false;
+        if (x_numerator == 0 && y_numerator == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    int x_numerator = (l1->c * l2->b - l1->b * l2->c) * signum(x_denominator);
-    int y_numerator = (l1->c * l2->a - l1->a * l2->c) * signum(y_denominator);
+    x_numerator *= signum(x_denominator);
+    y_numerator *= signum(y_denominator);
+
+    x_denominator = std::abs(x_denominator);
+    y_denominator = std::abs(y_denominator);
 
     int overlap_x_min = std::max(l1->x_min, l2->x_min) * std::abs(x_denominator);
     int overlap_y_min = std::max(l1->y_min, l2->y_min) * std::abs(y_denominator);
@@ -39,6 +57,11 @@ bool lines_intersect(line* l1, line* l2)
 
 bool line_contains_point(line* l, point* p)
 {
+    if (l == nullptr || p == nullptr)
+    {
+        return false;
+    }
+
     if (l->p1 == p || l->p2 == p)
     {
         return false;

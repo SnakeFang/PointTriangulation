@@ -52,7 +52,7 @@ void svgify(const std::string& file_name, int bounding_box_x_min, int bounding_b
         double x = 50 + x_scale * (p->x - bounding_box_x_min);
         double y = 50 + y_scale * (p->y - bounding_box_y_min);
 
-        file << "  <circle cx=\"" << x << "\" cy=\"" << y << "\" r=\"10\" fill=\"black\" />\n";
+        file << "  <circle cx=\"" << x << "\" cy=\"" << y << "\" r=\"5\" fill=\"black\" />\n";
     }
 
     file << '\n';
@@ -72,7 +72,7 @@ void svgify(const std::string& file_name, int bounding_box_x_min, int bounding_b
     file << std::flush;
 }
 
-void txtify(const std::string& file_name, const std::vector<line*> lines)
+void txtify(const std::string& file_name, const std::vector<line*>& lines)
 {
     std::ofstream file(file_name);
 

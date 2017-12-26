@@ -1,3 +1,6 @@
+#include <functional>
+#include <iostream>
+
 #include "main.h"
 
 std::vector<line*> triangulate_moving_shell(const std::vector<point*>& points)
@@ -7,75 +10,107 @@ std::vector<line*> triangulate_moving_shell(const std::vector<point*>& points)
     std::vector<line*> lines_all;
     std::vector<line*> lines_shell;
 
-    std::sort(points_all.begin(), points_all.end(), [](point* p1, point* p2) -> bool { return p1->x < p2->x; });
+    std::sort(points_all.begin(), points_all.end(), [](point* p1, point* p2) -> bool { return p1->x < p2->x || (p1->x == p2->x && p1->y < p2->y); });
+
+    int n = 0;
 
     for (point* point_new : points_all)
     {
-        std::vector<point*> points_connected;
+        point* point_min = nullptr;
+        line line_min;
 
+        point* point_max = nullptr;
+        line line_max;
+        
         for (point* point_shell : points_shell)
         {
-            line line_candidate(point_new, point_shell);
+            point_shell->reached = false;
 
-            if (!std::any_of(lines_shell.begin(), lines_shell.end(), std::bind(&lines_intersect, &line_candidate, std::placeholders::_1)))
+            line line_new(point_new, point_shell);
+
+            if (!std::any_of(lines_shell.begin(), lines_shell.end(), std::bind(&lines_intersect, &line_new, std::placeholders::_1)))
             {
-                line* line_shell = new line(line_candidate);
+                point_shell->reached = true;
+                point_shell->connected++;
 
-                lines_all.push_back(line_shell);
-                lines_shell.push_back(line_shell);
-                points_connected.push_back(point_shell);
-            }
-        }
-
-        for (point* point_connected : points_connected)
-        {
-            for (line* line_connected : point_connected->lines_connected)
-            {
-                line_connected->connections++;
-
-                if (line_connected->connections == 2)
+                if (point_min == nullptr || point_shell->y < point_min->y || (point_shell->y == point_min->y && point_shell->x < point_min->x))
                 {
-                    line_connected->p1->lines_shared++;
-                    line_connected->p2->lines_shared++;
+                    point_min = point_shell;
+                    line_min = line_new;
+                }
+
+                if (point_max == nullptr || point_shell->y > point_max->y || (point_shell->y == point_max->y && point_shell->x > point_max->x))
+                {
+                    point_max = point_shell;
+                    line_max = line_new;
                 }
             }
         }
 
-        lines_shell.erase(std::remove_if(lines_shell.begin(), lines_shell.end(), [](line* line_shell) -> bool { return line_shell->connections > 1 || line_shell->p1->lines_shared > 1 || line_shell->p2->lines_shared > 1; }), lines_shell.end());
+        points_shell.push_back(point_new);
 
-        for (point* point_shell : points_shell)
+        if (point_min != nullptr && point_max != nullptr)
         {
-            point_shell->in_shell = false;
-            point_shell->lines_shared = 0;
-            point_shell->lines_connected.clear();
-        }
-
-        points_shell.clear();
-
-        for (line* line_shell : lines_shell)
-        {
-            line_shell->connections = 0;
-
-            line_shell->p1->lines_connected.push_back(line_shell);
-            line_shell->p2->lines_connected.push_back(line_shell);
-
-            if (!line_shell->p1->in_shell)
+            if (point_min != point_max)
             {
-                points_shell.push_back(line_shell->p1);
-                line_shell->p1->in_shell = true;
+                point_new->connected = 2;
+
+                lines_shell.push_back(new line(line_min));
+                lines_all.push_back(lines_shell.back());
+                lines_shell.push_back(new line(line_max));
+                lines_all.push_back(lines_shell.back());
+            }
+            else
+            {
+                point_new->connected = 1;
+
+                lines_shell.push_back(new line(line_min));
+                lines_all.push_back(lines_shell.back());
             }
 
-            if (!line_shell->p2->in_shell)
+            for (point* point_shell : points_shell)
             {
-                points_shell.push_back(line_shell->p2);
-                line_shell->p1->in_shell = true;
+                if (point_shell->reached && point_shell != point_min && point_shell != point_max)
+                {
+                    point_shell->removed = true;
+                }
             }
+
+            for (line* line_shell : lines_shell)
+            {
+                if (line_shell->p1->removed || line_shell->p2->removed)
+                {
+                    line_shell->removed = true;
+                    line_shell->p1->connected--;
+                    line_shell->p2->connected--;
+                }
+            }
+
+            for (line* line_shell : lines_shell)
+            {
+                if (line_shell->p1->connected >= 3 && line_shell->p2->connected >= 3)
+                {
+                    line_shell->removed = true;
+                    line_shell->p1->connected--;
+                    line_shell->p2->connected--;
+
+                    if (n == 9)
+                    {
+                        std::cout << line_shell->p1->x << ' ' << line_shell->p1->y << ' ' << line_shell->p2->x << ' ' << line_shell->p2->y << std::endl;
+                        std::cout << line_shell->p1->connected;
+                        std::cout << line_shell->p2->connected;
+                    }
+                }
+            }
+
+            points_shell.erase(std::remove_if(points_shell.begin(), points_shell.end(), [](point* point_shell) -> bool { return point_shell->removed; }), points_shell.end());
+            lines_shell.erase(std::remove_if(lines_shell.begin(), lines_shell.end(), [](line* line_shell) -> bool { return line_shell->removed; }), lines_shell.end());
+
         }
 
-        if (!point_new->in_shell)
-        {
-            points_shell.push_back(point_new);
-        }
+        svgify("partial_" + std::to_string(n) + ".svg", 0, 6, 0, 6, points_shell, lines_shell);
+
+        ++n;
     }
 
     return lines_all;

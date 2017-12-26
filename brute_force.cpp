@@ -1,3 +1,5 @@
+#include <functional>
+
 #include "main.h"
 
 std::vector<line*> triangulate_brute_force(const std::vector<point*>& points)

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -14,13 +13,17 @@ struct point
     int x;
     int y;
 
-    bool in_shell;
-    int lines_shared;
+    int connected;
+    bool reached;
+    bool removed;
+    
+    point(int x, int y)
+        : x(x), y(y), connected(0), reached(false), removed(false)
+    {
+    }
 
-    std::vector<line*> lines_connected;
-
-    point(int x = 0, int y = 0)
-        : x(x), y(y), in_shell(false), lines_shared(0), lines_connected()
+    point()
+        : x(0), y(0), connected(0), reached(false), removed(false)
     {
     }
 };
@@ -40,7 +43,7 @@ struct line
     int b;
     int c;
 
-    int connections;
+    bool removed;
 
     line(point* p1, point* p2)
         :
@@ -53,7 +56,22 @@ struct line
         a(p2->y - p1->y),
         b(p1->x - p2->x),
         c(p1->x * p2->y - p1->y * p2->x),
-        connections(0)
+        removed(false)
+    {
+    }
+
+    line()
+        :
+        p1(nullptr),
+        p2(nullptr),
+        x_min(0),
+        x_max(0),
+        y_min(0),
+        y_max(0),
+        a(0),
+        b(0),
+        c(0),
+        removed(false)
     {
     }
 };
