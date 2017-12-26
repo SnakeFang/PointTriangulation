@@ -38,7 +38,7 @@ bool lines_intersect(line* l1, line* l2)
     {
         if (x_numerator == 0 && y_numerator == 0)
         {
-            return overlap_x_min <= x_numerator && x_numerator <= overlap_x_max && overlap_y_min <= y_numerator && y_numerator <= overlap_y_max;
+            return true;
         }
         else
         {
