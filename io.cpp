@@ -36,7 +36,7 @@ std::tuple<std::vector<point*>, int, int, int, int> read_points()
     return return_value;
 }
 
-void svgify(const std::string& file_name, int bounding_box_x_min, int bounding_box_x_max, int bounding_box_y_min, int bounding_box_y_max, const std::vector<point*>& points, const std::vector<line*>& lines)
+void svgify(const std::string& file_name, int bounding_box_x_min, int bounding_box_x_max, int bounding_box_y_min, int bounding_box_y_max, const std::vector<point*>& points, const std::vector<line>& lines)
 {
     double x_scale, y_scale;
 
@@ -57,13 +57,13 @@ void svgify(const std::string& file_name, int bounding_box_x_min, int bounding_b
 
     file << '\n';
 
-    for (line* l : lines)
+    for (const line& l : lines)
     {
-        double x1 = 50 + x_scale * (l->p1->x - bounding_box_x_min);
-        double y1 = 50 + y_scale * (l->p1->y - bounding_box_y_min);
+        double x1 = 50 + x_scale * (l.p1->x - bounding_box_x_min);
+        double y1 = 50 + y_scale * (l.p1->y - bounding_box_y_min);
 
-        double x2 = 50 + x_scale * (l->p2->x - bounding_box_x_min);
-        double y2 = 50 + y_scale * (l->p2->y - bounding_box_y_min);
+        double x2 = 50 + x_scale * (l.p2->x - bounding_box_x_min);
+        double y2 = 50 + y_scale * (l.p2->y - bounding_box_y_min);
 
         file << "  <line x1=\"" << x1 << "\" y1=\"" << y1 << "\" x2=\"" << x2 << "\" y2=\"" << y2 << "\" stroke=\"black\" stroke-width=\"2\" />\n";
     }
@@ -72,13 +72,13 @@ void svgify(const std::string& file_name, int bounding_box_x_min, int bounding_b
     file << std::flush;
 }
 
-void txtify(const std::string& file_name, const std::vector<line*>& lines)
+void txtify(const std::string& file_name, const std::vector<line>& lines)
 {
     std::ofstream file(file_name);
 
-    for (line* l : lines)
+    for (const line& l : lines)
     {
-        file << '(' << l->p1->x << ", " << l->p1->y << "), (" << l->p2->x << ", " << l->p2->y << ")\n";
+        file << '(' << l.p1->x << ", " << l.p1->y << "), (" << l.p2->x << ", " << l.p2->y << ")\n";
     }
 
     file.flush();

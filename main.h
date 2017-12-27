@@ -16,7 +16,7 @@ struct point
     int connected;
     bool reached;
     bool removed;
-    
+
     point(int x, int y)
         : x(x), y(y), connected(0), reached(false), removed(false)
     {
@@ -76,12 +76,12 @@ struct line
     }
 };
 
-bool lines_intersect(line*, line*);
-bool line_contains_point(line*, point*);
+bool lines_intersect(const line&, const line&);
+bool line_contains_point(const line&, point*);
 
 std::tuple<std::vector<point*>, int, int, int, int> read_points();
-void svgify(const std::string&, int, int, int, int, const std::vector<point*>&, const std::vector<line*>&);
-void txtify(const std::string&, const std::vector<line*>&);
+void svgify(const std::string&, int, int, int, int, const std::vector<point*>&, const std::vector<line>&);
+void txtify(const std::string&, const std::vector<line>&);
 
-std::vector<line*> triangulate_brute_force(const std::vector<point*>&);
-std::vector<line*> triangulate_moving_shell(const std::vector<point*>&);
+std::vector<line> triangulate_brute_force(const std::vector<point*>&);
+std::vector<line> triangulate_moving_shell(const std::vector<point*>&);
